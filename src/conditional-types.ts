@@ -1,29 +1,13 @@
 import { User } from ".";
 
-
 /*
-    keyof T ==> are the keys and their type is string | symbol | number;
+    Create a mapped type of T that has all the keys of T that are not of type function or object.
+    Each value of a key is mapped to the key of the same name. { key1: "key1", key2: "key2" ... }
+    { key1: "key1", key2: "key2" ... } [keyof T] => return a union of keys => "key1" | "key2" | ...
 */
-
-type UserKeys = keyof User;
-const t1: UserKeys = "address";
-
-
-// Create a new type defined as a union of keys of the User type that are not of type function or object
-// Note: a function extends object!
 type NonObjectKeys<T> = { 
     [K in keyof T]: T[K] extends object ? never : K 
 } [keyof T];
-
-
-const nonObjectKey: NonObjectKeys<User>[] = ["name", "email", "id"];
-
-// if a key is of primitive type just return, if it is an object, return the keys of that object
-type NonObjectKeys2<T> = {
-    [K in keyof T]: T[K] extends object ? keyof T[K] : K
-}[keyof T];
-
-const test: NonObjectKeys2<User> = "zipcode";
 
 /* 
 
@@ -54,19 +38,34 @@ const concat2: ConcatWithDot<"as", ""> = "as";
 
 const concat3: ConcatWithDot<"address", ConcatWithDot<"street", "number">> = "address.street.number";
 
-
-type Path<T> = T extends object 
+type Path<T> = T extends object // { address: { street: number, zip: string } } 
             ? { 
                 [K in keyof T]: T[K] extends object 
-                ? ConcatWithDot<K, Path<T[K]>>
+                ? ConcatWithDot<K, Path<T[K]>> // <-- recursion
                 : K 
             } [keyof T] 
-            : "";
+            : ""; // base case for recursion
+
+/*
+    { 
+        address: { 
+            street: number, 
+            zip: string 
+        } 
+    }
+
+    { 
+        [K in keyof T]: T[K] extends object 
+        ? ConcatWithDot<K, Path<T[K]>> // <-- recursion
+        : K 
+    } [keyof T]
+
+    T[address] is object ?
+
+*/
 
 
-
-
-const path1: Path<User>[] = ["id", "name", "address.street.name"];
+const path1: Path<User>[] = ["id", "name", "address.street.name", "address.zipcode"];
 
 
 
