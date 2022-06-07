@@ -23,10 +23,13 @@ interface Item<T extends keyof ItemType> {
     metadata: ItemType[T];
 }
 
-function testCourseItem(item: Item<'course'>) {
-    item.metadata.lessons
-}
+// tell the typescript compiler that a declaration is defined somewhere else
+declare function handleItem<Key extends keyof ItemType>(
+    type: Key,
+    handler: (item: Item<Key>) => void
+): void
 
-function testWebinarItem(item: Item<'webinar'>) {
-    item.metadata.speakers;
-}
+handleItem('course', ( item ) => {
+    item.metadata.lessons
+})
+
