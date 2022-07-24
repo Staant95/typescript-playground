@@ -38,13 +38,15 @@ const concat2: ConcatWithDot<"as", ""> = "as";
 
 const concat3: ConcatWithDot<"address", ConcatWithDot<"street", "number">> = "address.street.number";
 
-type Path<T> = T extends object // { address: { street: number, zip: string } } 
+
+// https://github.com/microsoft/TypeScript/issues/30188#issuecomment-506047803
+type Path<T> = T extends infer Type
             ? { 
                 [K in keyof T]: T[K] extends object 
-                ? ConcatWithDot<K, Path<T[K]>> // <-- recursion
+                ? ConcatWithDot<K, Path<T[K]>>
                 : K 
-            } [keyof T] 
-            : ""; // base case for recursion
+            } [keyof Type] 
+            : "";
 
 /*
     { 
